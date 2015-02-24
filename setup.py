@@ -33,8 +33,8 @@ setup(
     extras_require={'tests': tests_require},
     include_package_data=True,
     entry_points={
-        'sentry.plugins': [
-            'auth_google = sentry_auth_google.plugin:GoogleAuthPlugin',
+        'sentry.apps': [
+            'auth_google = sentry_auth_google',
          ],
     },
     classifiers=[
