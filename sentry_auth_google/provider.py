@@ -1,14 +1,12 @@
 from __future__ import absolute_import, print_function
 
 from django.conf import settings
-from urllib import urlencode
 
-from sentry.auth import AuthView
 from sentry.auth.providers.oauth2 import (
     OAuth2Callback, OAuth2Provider, OAuth2Login
 )
-from sentry.http import safe_urlopen, safe_urlread
-from sentry.utils import json
+
+from .views import FetchUser, GoogleConfigureView
 
 AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/auth'
 
@@ -20,42 +18,6 @@ CLIENT_ID = getattr(settings, 'GOOGLE_CLIENT_ID', None)
 
 CLIENT_SECRET = getattr(settings, 'GOOGLE_CLIENT_SECRET', None)
 
-# requires Google+ API enabled
-USER_DETAILS_ENDPOINT = 'https://www.googleapis.com/plus/v1/people/me'
-
-ERR_INVALID_DOMAIN = 'The domain for your Google account is not allowed to authenticate with this provider.'
-
-ERR_NO_DOMAIN = 'You must authenticate via a Google Apps account.'
-
-
-class FetchUser(AuthView):
-    def __init__(self, domain=None, *args, **kwargs):
-        self.domain = domain
-        super(FetchUser, self).__init__(*args, **kwargs)
-
-    def dispatch(self, request, helper):
-        access_token = helper.fetch_state('data')['access_token']
-
-        req = safe_urlopen('{0}?{1}'.format(
-            USER_DETAILS_ENDPOINT,
-            urlencode({
-                'access_token': access_token,
-            }),
-        ))
-        body = safe_urlread(req)
-        data = json.loads(body)
-
-        if not data.get('domain'):
-            return helper.error(ERR_NO_DOMAIN)
-
-        # a domain may not yet be configured as this could be the setup flow
-        if self.domain and self.domain != data['domain']:
-            return helper.error(ERR_INVALID_DOMAIN)
-
-        helper.bind_state('user', data)
-
-        return helper.next_step()
-
 
 class GoogleOAuth2Provider(OAuth2Provider):
     name = 'Google'
@@ -63,6 +25,9 @@ class GoogleOAuth2Provider(OAuth2Provider):
     def __init__(self, domain=None, **config):
         self.domain = domain
         super(GoogleOAuth2Provider, self).__init__(**config)
+
+    def get_configure_view(self):
+        return GoogleConfigureView.as_view()
 
     def get_auth_pipeline(self):
         return [
