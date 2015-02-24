@@ -14,7 +14,6 @@ tests_require = [
 ]
 
 install_requires = [
-    'sentry>=7.4.0',
 ]
 
 setup(
