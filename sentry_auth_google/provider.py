@@ -6,17 +6,11 @@ from sentry.auth.providers.oauth2 import (
     OAuth2Callback, OAuth2Provider, OAuth2Login
 )
 
+from .constants import (
+    AUTHORIZE_URL, ACCESS_TOKEN_URL, CLIENT_ID, CLIENT_SECRET, SCOPE,
+    USER_DETAILS_ENDPOINT
+)
 from .views import FetchUser, GoogleConfigureView
-
-AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/auth'
-
-ACCESS_TOKEN_URL = 'https://accounts.google.com/o/oauth2/token'
-
-SCOPE = 'email'
-
-CLIENT_ID = getattr(settings, 'GOOGLE_CLIENT_ID', None)
-
-CLIENT_SECRET = getattr(settings, 'GOOGLE_CLIENT_SECRET', None)
 
 
 class GoogleOAuth2Provider(OAuth2Provider):
@@ -69,3 +63,17 @@ class GoogleOAuth2Provider(OAuth2Provider):
                 'access_token': state['data']['access_token'],
             },
         }
+
+    def identity_is_valid(self, auth_identity):
+        access_token = auth_identity.data['access_token']
+
+        req = safe_urlopen('{0}?{1}'.format(
+            USER_DETAILS_ENDPOINT,
+            urlencode({
+                'access_token': access_token,
+            }),
+        ))
+
+        if req.status_code == 401:
+            return False
+        return True
