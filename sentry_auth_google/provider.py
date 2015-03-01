@@ -4,6 +4,7 @@ from django.conf import settings
 from sentry.auth.providers.oauth2 import (
     OAuth2Callback, OAuth2Provider, OAuth2Login
 )
+from time import time
 from urllib import urlencode
 
 from .constants import (
@@ -27,6 +28,7 @@ class GoogleOAuth2Provider(OAuth2Provider):
         params = super(GoogleOAuth2Provider, self).get_authorize_params(
             state, redirect_uri
         )
+        params['approval_prompt'] = 'force'
         params['access_type'] = 'offline'
         if self.domain:
             params['hd'] = self.domain
@@ -73,7 +75,7 @@ class GoogleOAuth2Provider(OAuth2Provider):
                 'access_token': data['access_token'],
                 'refresh_token': data.get('refresh_token'),
                 'token_type': data['token_type'],
-                'expires': time.time() + data['expires_in'],
+                'expires': time() + data['expires_in'],
             },
         }
 
