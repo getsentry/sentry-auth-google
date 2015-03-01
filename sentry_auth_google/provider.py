@@ -24,9 +24,13 @@ class GoogleOAuth2Provider(OAuth2Provider):
         return GoogleConfigureView.as_view()
 
     def get_auth_pipeline(self):
+        if self.domain:
+            authorize_url = '{}?hd={}'.format(AUTHORIZE_URL, self.domain)
+        else:
+            authorize_url = AUTHORIZE_URL
         return [
             OAuth2Login(
-                authorize_url=AUTHORIZE_URL,
+                authorize_url=authorize_url,
                 scope=SCOPE,
                 client_id=CLIENT_ID,
             ),
