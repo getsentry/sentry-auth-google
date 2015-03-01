@@ -28,6 +28,8 @@ class GoogleOAuth2Provider(OAuth2Provider):
         params = super(GoogleOAuth2Provider, self).get_authorize_params(
             state, redirect_uri
         )
+        # without force on approval_prompt we're not guaranteed to receive
+        # a refresh_token
         params['approval_prompt'] = 'force'
         params['access_type'] = 'offline'
         if self.domain:
