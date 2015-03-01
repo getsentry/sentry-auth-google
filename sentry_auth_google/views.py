@@ -5,12 +5,7 @@ from sentry.http import safe_urlopen, safe_urlread
 from sentry.utils import json
 from urllib import urlencode
 
-# requires Google+ API enabled
-USER_DETAILS_ENDPOINT = 'https://www.googleapis.com/plus/v1/people/me'
-
-ERR_INVALID_DOMAIN = 'The domain for your Google account is not allowed to authenticate with this provider.'
-
-ERR_NO_DOMAIN = 'You must authenticate via a Google Apps account.'
+from .constants import ERR_INVALID_DOMAIN, ERR_NO_DOMAIN, USER_DETAILS_ENDPOINT
 
 
 class FetchUser(AuthView):
