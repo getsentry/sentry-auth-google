@@ -1,10 +1,10 @@
 from __future__ import absolute_import, print_function
 
 from django.conf import settings
-
 from sentry.auth.providers.oauth2 import (
     OAuth2Callback, OAuth2Provider, OAuth2Login
 )
+from urllib import urlencode
 
 from .constants import (
     AUTHORIZE_URL, ACCESS_TOKEN_URL, CLIENT_ID, CLIENT_SECRET, SCOPE,
@@ -23,14 +23,19 @@ class GoogleOAuth2Provider(OAuth2Provider):
     def get_configure_view(self):
         return GoogleConfigureView.as_view()
 
-    def get_auth_pipeline(self):
+    def get_authorize_params(self, state, redirect_uri):
+        params = super(GoogleOAuth2Provider, self).get_authorize_params(
+            state, redirect_uri
+        )
+        params['access_type'] = 'offline'
         if self.domain:
-            authorize_url = '{}?hd={}'.format(AUTHORIZE_URL, self.domain)
-        else:
-            authorize_url = AUTHORIZE_URL
+            params['hd'] = self.domain
+        return params
+
+    def get_auth_pipeline(self):
         return [
             OAuth2Login(
-                authorize_url=authorize_url,
+                authorize_url=AUTHORIZE_URL,
                 scope=SCOPE,
                 client_id=CLIENT_ID,
             ),
@@ -57,6 +62,7 @@ class GoogleOAuth2Provider(OAuth2Provider):
         #   "domain": "getsentry.com",
         #   "verified": false
         # }
+        data = state['data']
         user_data = state['user']
         return {
             'id': user_data['id'],
@@ -64,7 +70,10 @@ class GoogleOAuth2Provider(OAuth2Provider):
             'email': user_data['emails'][0]['value'],
             'name': user_data['displayName'],
             'data': {
-                'access_token': state['data']['access_token'],
+                'access_token': data['access_token'],
+                'refresh_token': data.get('refresh_token'),
+                'token_type': data['token_type'],
+                'expires': time.time() + data['expires_in'],
             },
         }
 
