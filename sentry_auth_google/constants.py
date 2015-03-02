@@ -5,7 +5,7 @@ from django.conf import settings
 
 AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/auth'
 
-ACCESS_TOKEN_URL = 'https://accounts.google.com/o/oauth2/token'
+ACCESS_TOKEN_URL = 'https://www.googleapis.com/oauth2/v3/token'
 
 CLIENT_ID = getattr(settings, 'GOOGLE_CLIENT_ID', None)
 

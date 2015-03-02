@@ -4,12 +4,10 @@ from django.conf import settings
 from sentry.auth.providers.oauth2 import (
     OAuth2Callback, OAuth2Provider, OAuth2Login
 )
-from time import time
 from urllib import urlencode
 
 from .constants import (
-    AUTHORIZE_URL, ACCESS_TOKEN_URL, CLIENT_ID, CLIENT_SECRET, SCOPE,
-    USER_DETAILS_ENDPOINT
+    AUTHORIZE_URL, ACCESS_TOKEN_URL, CLIENT_ID, CLIENT_SECRET, SCOPE
 )
 from .views import FetchUser, GoogleConfigureView
 
@@ -51,6 +49,9 @@ class GoogleOAuth2Provider(OAuth2Provider):
             FetchUser(domain=self.domain),
         ]
 
+    def get_refresh_token_url(self):
+        return ACCESS_TOKEN_URL
+
     def build_config(self, state):
         # TODO(dcramer): we actually want to enforce a domain here. Should that
         # be a view which does that, or should we allow this step to raise
@@ -73,24 +74,5 @@ class GoogleOAuth2Provider(OAuth2Provider):
             # TODO: is there a "correct" email?
             'email': user_data['emails'][0]['value'],
             'name': user_data['displayName'],
-            'data': {
-                'access_token': data['access_token'],
-                'refresh_token': data.get('refresh_token'),
-                'token_type': data['token_type'],
-                'expires': time() + data['expires_in'],
-            },
+            'data': self.get_oauth_data(data),
         }
-
-    def identity_is_valid(self, auth_identity):
-        access_token = auth_identity.data['access_token']
-
-        req = safe_urlopen('{0}?{1}'.format(
-            USER_DETAILS_ENDPOINT,
-            urlencode({
-                'access_token': access_token,
-            }),
-        ))
-
-        if req.status_code == 401:
-            return False
-        return True
