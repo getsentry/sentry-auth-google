@@ -12,18 +12,17 @@ from .constants import (
 from .views import FetchUser, GoogleConfigureView
 
 
-class GoogleOAuth2Provider(OAuth2Provider):
-    name = 'Google'
+class GoogleOAuth2Login(OAuth2Login):
+    authorize_url = AUTHORIZE_URL
+    client_id = CLIENT_ID
+    scope = SCOPE
 
-    def __init__(self, domain=None, **config):
+    def __init__(self, domain=None):
         self.domain = domain
-        super(GoogleOAuth2Provider, self).__init__(**config)
-
-    def get_configure_view(self):
-        return GoogleConfigureView.as_view()
+        super(GoogleOAuth2Login, self).__init__()
 
     def get_authorize_params(self, state, redirect_uri):
-        params = super(GoogleOAuth2Provider, self).get_authorize_params(
+        params = super(GoogleOAuth2Login, self).get_authorize_params(
             state, redirect_uri
         )
         # without force on approval_prompt we're not guaranteed to receive
@@ -34,13 +33,20 @@ class GoogleOAuth2Provider(OAuth2Provider):
             params['hd'] = self.domain
         return params
 
+
+class GoogleOAuth2Provider(OAuth2Provider):
+    name = 'Google'
+
+    def __init__(self, domain=None, **config):
+        self.domain = domain
+        super(GoogleOAuth2Provider, self).__init__(**config)
+
+    def get_configure_view(self):
+        return GoogleConfigureView.as_view()
+
     def get_auth_pipeline(self):
         return [
-            OAuth2Login(
-                authorize_url=AUTHORIZE_URL,
-                scope=SCOPE,
-                client_id=CLIENT_ID,
-            ),
+            GoogleOAuth2Login(domain=self.domain),
             OAuth2Callback(
                 access_token_url=ACCESS_TOKEN_URL,
                 client_id=CLIENT_ID,
