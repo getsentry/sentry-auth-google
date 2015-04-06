@@ -36,6 +36,8 @@ class GoogleOAuth2Login(OAuth2Login):
 
 class GoogleOAuth2Provider(OAuth2Provider):
     name = 'Google'
+    client_id = CLIENT_ID
+    client_secret = CLIENT_SECRET
 
     def __init__(self, domain=None, **config):
         self.domain = domain
@@ -49,8 +51,8 @@ class GoogleOAuth2Provider(OAuth2Provider):
             GoogleOAuth2Login(domain=self.domain),
             OAuth2Callback(
                 access_token_url=ACCESS_TOKEN_URL,
-                client_id=CLIENT_ID,
-                client_secret=CLIENT_SECRET,
+                client_id=self.client_id,
+                client_secret=self.client_secret,
             ),
             FetchUser(domain=self.domain),
         ]
