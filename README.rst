@@ -9,7 +9,9 @@ Setup
 
 Once the package is installed, you'll need to configure the following settings:
 
-```
-GOOGLE_CLIENT_ID = ""
-GOOGLE_CLIENT_SECRET = ""
-```
+::
+
+    GOOGLE_CLIENT_ID = ""
+
+    GOOGLE_CLIENT_SECRET = ""
+
