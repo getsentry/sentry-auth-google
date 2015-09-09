@@ -29,8 +29,6 @@ class GoogleOAuth2Login(OAuth2Login):
         # a refresh_token
         params['approval_prompt'] = 'force'
         params['access_type'] = 'offline'
-        if self.domain:
-            params['hd'] = self.domain
         return params
 
 
