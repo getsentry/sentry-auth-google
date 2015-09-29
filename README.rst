@@ -3,7 +3,6 @@ Google Auth for Sentry
 
 An SSO provider for Sentry which enables Google Apps authentication.
 
-
 Install
 -------
 
