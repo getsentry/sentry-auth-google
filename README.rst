@@ -19,6 +19,8 @@ In the **Authorized redirect URIs** add the SSO endpoint for your installation::
 
     https://sentry.example.com/auth/sso/
 
+You will also need to enable the **Google+ API**.
+
 Finally, obtain the API keys and plug them into your ``sentry.conf.py``:
 
 .. code-block:: python
