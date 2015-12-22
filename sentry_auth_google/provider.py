@@ -25,9 +25,10 @@ class GoogleOAuth2Login(OAuth2Login):
         params = super(GoogleOAuth2Login, self).get_authorize_params(
             state, redirect_uri
         )
-        # without force on approval_prompt we're not guaranteed to receive
-        # a refresh_token
-        params['approval_prompt'] = 'force'
+        # TODO(dcramer): ideally we could look at the current resulting state
+        # when an existing auth happens, and if they're missing a refresh_token
+        # we should re-prompt them a second time with ``approval_prompt=force``
+        # params['approval_prompt'] = 'force'
         params['access_type'] = 'offline'
         return params
 
