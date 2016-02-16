@@ -18,7 +18,7 @@ tests_require = [
 
 setup(
     name='sentry-auth-google',
-    version='0.1.0',
+    version='0.2.0.dev0',
     author='Sentry',
     author_email='support@getsentry.com',
     url='https://www.getsentry.com',
