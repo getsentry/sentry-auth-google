@@ -1,10 +1,8 @@
 from __future__ import absolute_import, print_function
 
-from django.conf import settings
 from sentry.auth.providers.oauth2 import (
     OAuth2Callback, OAuth2Provider, OAuth2Login
 )
-from urllib import urlencode
 
 from .constants import (
     AUTHORIZE_URL, ACCESS_TOKEN_URL, CLIENT_ID, CLIENT_SECRET, SCOPE
