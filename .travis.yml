@@ -5,19 +5,19 @@ services:
   - postgresql
   - redis-server
 python:
-  - "2.7"
+  - '2.7'
 cache:
   directories:
     - node_modules
-    - $HOME/.cache/pip
+    - "$HOME/.cache/pip"
 deploy:
   provider: pypi
   user: getsentry
   password:
-    secure: NMwOI1H9arp2vbgaidx9OY6y8990hiu0WsHtowEvEdGKXNzAQcy0sW3SoKcB6FN0bk11xhj49+5C++KAwMYwE/SL8Y5OoZ1/iYVI4/XlWNukr+1/pfPKVMgw3v5W+pL5Ba9TBdFfIoFPNYUDPLItSSjg94Bm95034gBkYWC5Hl0=
+    secure: rxcTucdBjCLO70XNANoVEcqnffR+2ZVFsnhA/lKkr+NC23GIHhDql6k3ZpXL2mRnA0UHA/AHK/PounBbN8xom7PKbS0MNwlNswBWax7C4OajxD79+a8UhzE5oxEPoA4VQxw65RKscVYt6rhZ6ynRemXVQDjokthVbDuEFZ4irM+Mbkxuq1O9RvDHOot3Q5AxxDwo7hFhuhOvsqs13FBXv28YLzDExirVQBoabck1Is+0pkPiqR5Mwoh6D9yDFA/fZzoX9ROqJfTAmpWQNwvwXEk1O6W42V3JDD/n+WaZ2jxyGTlmrJ/OzONSz0E+hMpoIJtTuz1vb7WL+hjTAZDd01dxECizsY5g0j/NDTvkaNWJSBXX9HGmAQYxShuGE2Q2/zJGAxSx3x6CgtQSuA00Y4TzZ8OadXLIQ1dSK2EeovEj0dZ7Q75L7ZmNszObUPB170ZJC4blmcYM+17dtSQbfuQkvhoAvhApXpyZQNr2NAme1ZC44s62IEPwMLWEMbdsBzTJCDT6RSmWuEMzs/WSw1w1P1DNXILkIDONyVbcwwM22aMkaG0F8V05qqlkXQPBmj7X9LX6YaX5zplzt8S5E1KsBuiOcKGjw5sQwrw06KR+79j+r/ORbSiTrS7xUBANradohP5jDou4R/nsxf1VuDQmGnFoL6kkE4YHpW0itLE=
   on:
     tags: true
-  distributions: 'sdist bdist_wheel'
+  distributions: sdist bdist_wheel
 env:
   global:
     - PIP_DOWNLOAD_CACHE=".pip_download_cache"
