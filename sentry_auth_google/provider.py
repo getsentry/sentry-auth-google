@@ -59,7 +59,7 @@ class GoogleOAuth2Provider(OAuth2Provider):
 
     def build_config(self, state):
         return {
-            'domain': state['user']['email'][ state['user']['email'].rfind('@') : ]
+            'domain': DOMAIN
         }
 
     def build_identity(self, state):
