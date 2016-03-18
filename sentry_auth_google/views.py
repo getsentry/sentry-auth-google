@@ -49,4 +49,4 @@ class GoogleConfigureView(ConfigureView):
         return self.render('sentry_auth_google/configure.html')
 
 def extractDomain(email):
-    return email[ email.rfind("@") : ]
+    return email[ email.rfind("@") + 1 : ]
