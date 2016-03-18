@@ -11,9 +11,12 @@ CLIENT_ID = getattr(settings, 'GOOGLE_CLIENT_ID', None)
 
 CLIENT_SECRET = getattr(settings, 'GOOGLE_CLIENT_SECRET', None)
 
-ERR_INVALID_DOMAIN = 'The domain for your Google account is not allowed to authenticate with this provider.'
+DOMAIN = getattr(settings, 'GOOGLE_APPS_DOMAIN', None)
+
+ERR_INVALID_DOMAIN = 'The domain for your Google account (%s) is not allowed to authenticate with this provider (%s).'
+
+ERR_INVALID_RESPONSE = 'Unable to fetch user information from Google.  Please check the log.'
 
 SCOPE = 'email'
 
-# requires Google+ API enabled
-USER_DETAILS_ENDPOINT = 'https://www.googleapis.com/plus/v1/people/me'
+USER_DETAILS_ENDPOINT = 'https://www.googleapis.com/userinfo/email'

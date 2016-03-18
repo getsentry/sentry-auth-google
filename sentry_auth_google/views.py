@@ -5,7 +5,7 @@ from sentry.http import safe_urlopen, safe_urlread
 from sentry.utils import json
 from urllib import urlencode
 
-from .constants import ERR_INVALID_DOMAIN, USER_DETAILS_ENDPOINT
+from .constants import ERR_INVALID_DOMAIN, ERR_INVALID_RESPONSE, USER_DETAILS_ENDPOINT
 
 
 class FetchUser(AuthView):
@@ -16,25 +16,36 @@ class FetchUser(AuthView):
     def dispatch(self, request, helper):
         access_token = helper.fetch_state('data')['access_token']
 
-        req = safe_urlopen('{0}?{1}'.format(
+        req = safe_urlopen('{0}?{1}&alt=json'.format(
             USER_DETAILS_ENDPOINT,
             urlencode({
                 'access_token': access_token,
-            }),
+            })
         ))
         body = safe_urlread(req)
         data = json.loads(body)
 
-        if not data.get('domain'):
-            return helper.error(ERR_INVALID_DOMAIN)
+        if not data.get('data'):
+            #TODO(cnuss): Propagate this error to Sentry?
+            print('Invalid response: %s' % body)
+            return helper.error(ERR_INVALID_RESPONSE)
 
-        # a domain may not yet be configured as this could be the setup flow
-        if self.domain and self.domain != data['domain']:
-            return helper.error(ERR_INVALID_DOMAIN)
+        if not data.get('data').get('email'):
+            #TODO(cnuss): Propagate this error to Sentry?
+            print('Invalid response: %s' % body)
+            return helper.error(ERR_INVALID_RESPONSE)
+
+        domain = extractDomain(data.get('data').get('email'))
+
+        if self.domain and self.domain != domain:
+            return helper.error(ERR_INVALID_DOMAIN % (domain, self.domain))
 
         helper.bind_state('user', data)
 
         return helper.next_step()
+
+    def extractDomain(email):
+        return email[ email.rfind("@") : ]
 
 
 class GoogleConfigureView(ConfigureView):

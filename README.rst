@@ -15,15 +15,19 @@ Setup
 
 Start by `creating a project in the Google Developers Console <https://console.developers.google.com>`_.
 
+In the **Authorized JavaScript origins** add the Root URL for your installation::
+
+	https://sentry.example.com
+
 In the **Authorized redirect URIs** add the SSO endpoint for your installation::
 
     https://sentry.example.com/auth/sso/
 
-You will also need to enable the **Google+ API**.
-
-Finally, obtain the API keys and plug them into your ``sentry.conf.py``:
+Finally, obtain the API keys and plug them into your ``sentry.conf.py``, as well as the primary domain for your Google Apps account:
 
 .. code-block:: python
+
+    GOOGLE_APPS_DOMAIN = ""
 
     GOOGLE_CLIENT_ID = ""
 
