@@ -40,7 +40,7 @@ class FetchUser(AuthView):
         if self.domain and self.domain != domain:
             return helper.error(ERR_INVALID_DOMAIN % (domain, self.domain))
 
-        helper.bind_state('user', data)
+        helper.bind_state('user', data.get('data'))
 
         return helper.next_step()
 
