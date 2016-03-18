@@ -44,10 +44,6 @@ class FetchUser(AuthView):
 
         return helper.next_step()
 
-    def extractDomain(email):
-        return email[ email.rfind("@") : ]
-
-
 class GoogleConfigureView(ConfigureView):
     def dispatch(self, request, organization, auth_provider):
         return self.render('sentry_auth_google/configure.html')
