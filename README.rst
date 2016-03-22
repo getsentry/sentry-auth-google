@@ -23,11 +23,9 @@ In the **Authorized redirect URIs** add the SSO endpoint for your installation::
 
     https://sentry.example.com/auth/sso/
 
-Finally, obtain the API keys and plug them into your ``sentry.conf.py``, as well as the primary domain for your Google Apps account:
+Finally, obtain the API keys and plug them into your ``sentry.conf.py``:
 
 .. code-block:: python
-
-    GOOGLE_APPS_DOMAIN = ""
 
     GOOGLE_CLIENT_ID = ""
 
