@@ -5,7 +5,7 @@ from sentry.auth.providers.oauth2 import (
 )
 
 from .constants import (
-    AUTHORIZE_URL, ACCESS_TOKEN_URL, CLIENT_ID, CLIENT_SECRET, DOMAIN, SCOPE
+    AUTHORIZE_URL, ACCESS_TOKEN_URL, CLIENT_ID, CLIENT_SECRET, SCOPE
 )
 from .views import FetchUser, GoogleConfigureView
 
@@ -59,7 +59,7 @@ class GoogleOAuth2Provider(OAuth2Provider):
 
     def build_config(self, state):
         return {
-            'domain': DOMAIN
+            'domain': state['domain']
         }
 
     def build_identity(self, state):

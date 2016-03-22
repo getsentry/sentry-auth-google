@@ -1,5 +1,7 @@
 from __future__ import absolute_import, print_function
 
+import logging
+
 from sentry.auth.view import AuthView, ConfigureView
 from sentry.http import safe_urlopen, safe_urlread
 from sentry.utils import json
@@ -7,6 +9,7 @@ from urllib import urlencode
 
 from .constants import ERR_INVALID_DOMAIN, ERR_INVALID_RESPONSE, USER_DETAILS_ENDPOINT
 
+logger = logging.getLogger('sentry.auth.google')
 
 class FetchUser(AuthView):
     def __init__(self, domain=None, *args, **kwargs):
@@ -26,20 +29,19 @@ class FetchUser(AuthView):
         data = json.loads(body)
 
         if not data.get('data'):
-            #TODO(cnuss): Propagate this error to Sentry?
-            print('Invalid response: %s' % body)
+            logger.error('Invalid response: %s' % body)
             return helper.error(ERR_INVALID_RESPONSE)
 
         if not data.get('data').get('email'):
-            #TODO(cnuss): Propagate this error to Sentry?
-            print('Invalid response: %s' % body)
+            logger.error('Invalid response: %s' % body)
             return helper.error(ERR_INVALID_RESPONSE)
 
-        domain = extractDomain(data.get('data').get('email'))
+        domain = extract_domain(data.get('data').get('email'))
 
         if self.domain and self.domain != domain:
             return helper.error(ERR_INVALID_DOMAIN % (domain, self.domain))
 
+        helper.bind_state('domain', domain)
         helper.bind_state('user', data.get('data'))
 
         return helper.next_step()
@@ -48,5 +50,5 @@ class GoogleConfigureView(ConfigureView):
     def dispatch(self, request, organization, auth_provider):
         return self.render('sentry_auth_google/configure.html')
 
-def extractDomain(email):
-    return email[ email.rfind("@") + 1 : ]
+def extract_domain(email):
+    return email.rsplit('@', 1)[-1]
