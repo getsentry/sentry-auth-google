@@ -15,10 +15,6 @@ Setup
 
 Start by `creating a project in the Google Developers Console <https://console.developers.google.com>`_.
 
-In the **Authorized JavaScript origins** add the Root URL for your installation::
-
-	https://sentry.example.com
-
 In the **Authorized redirect URIs** add the SSO endpoint for your installation::
 
     https://sentry.example.com/auth/sso/
