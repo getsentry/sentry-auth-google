@@ -58,11 +58,8 @@ class GoogleOAuth2Provider(OAuth2Provider):
         return ACCESS_TOKEN_URL
 
     def build_config(self, state):
-        # TODO(dcramer): we actually want to enforce a domain here. Should that
-        # be a view which does that, or should we allow this step to raise
-        # validation errors?
         return {
-            'domain': state['user']['domain'],
+            'domain': state['domain']
         }
 
     def build_identity(self, state):
@@ -75,9 +72,8 @@ class GoogleOAuth2Provider(OAuth2Provider):
         data = state['data']
         user_data = state['user']
         return {
-            'id': user_data['id'],
-            # TODO: is there a "correct" email?
-            'email': user_data['emails'][0]['value'],
-            'name': user_data['displayName'],
+            'id': user_data['email'],
+            'email': user_data['email'],
+            'name': user_data['email'],
             'data': self.get_oauth_data(data),
         }
