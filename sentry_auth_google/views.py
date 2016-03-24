@@ -11,6 +11,7 @@ from .constants import ERR_INVALID_DOMAIN, ERR_INVALID_RESPONSE, USER_DETAILS_EN
 
 logger = logging.getLogger('sentry.auth.google')
 
+
 class FetchUser(AuthView):
     def __init__(self, domain=None, *args, **kwargs):
         self.domain = domain
@@ -46,9 +47,11 @@ class FetchUser(AuthView):
 
         return helper.next_step()
 
+
 class GoogleConfigureView(ConfigureView):
     def dispatch(self, request, organization, auth_provider):
         return self.render('sentry_auth_google/configure.html')
+
 
 def extract_domain(email):
     return email.rsplit('@', 1)[-1]
