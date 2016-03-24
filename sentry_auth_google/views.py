@@ -7,7 +7,10 @@ from sentry.http import safe_urlopen, safe_urlread
 from sentry.utils import json
 from urllib import urlencode
 
-from .constants import ERR_INVALID_DOMAIN, ERR_INVALID_RESPONSE, USER_DETAILS_ENDPOINT
+from .constants import (
+    DOMAIN_BLOCKLIST, ERR_INVALID_DOMAIN, ERR_INVALID_RESPONSE,
+    USER_DETAILS_ENDPOINT
+)
 
 logger = logging.getLogger('sentry.auth.google')
 
@@ -38,6 +41,9 @@ class FetchUser(AuthView):
             return helper.error(ERR_INVALID_RESPONSE)
 
         domain = extract_domain(data.get('data').get('email'))
+
+        if domain in DOMAIN_BLOCKLIST:
+            return helper.error(ERR_INVALID_DOMAIN % (domain, self.domain))
 
         if self.domain and self.domain != domain:
             return helper.error(ERR_INVALID_DOMAIN % (domain, self.domain))
