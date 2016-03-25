@@ -43,10 +43,10 @@ class FetchUser(AuthView):
         domain = extract_domain(data.get('data').get('email'))
 
         if domain in DOMAIN_BLOCKLIST:
-            return helper.error(ERR_INVALID_DOMAIN % (domain, self.domain))
+            return helper.error(ERR_INVALID_DOMAIN % (domain,))
 
         if self.domain and self.domain != domain:
-            return helper.error(ERR_INVALID_DOMAIN % (domain, self.domain))
+            return helper.error(ERR_INVALID_DOMAIN % (domain,))
 
         helper.bind_state('domain', domain)
         helper.bind_state('user', data.get('data'))
