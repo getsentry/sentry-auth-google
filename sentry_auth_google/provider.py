@@ -26,7 +26,7 @@ class GoogleOAuth2Login(OAuth2Login):
         # TODO(dcramer): ideally we could look at the current resulting state
         # when an existing auth happens, and if they're missing a refresh_token
         # we should re-prompt them a second time with ``approval_prompt=force``
-        # params['approval_prompt'] = 'force'
+        params['approval_prompt'] = 'force'
         params['access_type'] = 'offline'
         return params
 
