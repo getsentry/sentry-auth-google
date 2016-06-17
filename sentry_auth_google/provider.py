@@ -5,7 +5,8 @@ from sentry.auth.providers.oauth2 import (
 )
 
 from .constants import (
-    AUTHORIZE_URL, ACCESS_TOKEN_URL, CLIENT_ID, CLIENT_SECRET, SCOPE
+    AUTHORIZE_URL, ACCESS_TOKEN_URL, CLIENT_ID, CLIENT_SECRET, DATA_VERSION,
+    SCOPE
 )
 from .views import FetchUser, GoogleConfigureView
 
@@ -36,8 +37,17 @@ class GoogleOAuth2Provider(OAuth2Provider):
     client_id = CLIENT_ID
     client_secret = CLIENT_SECRET
 
-    def __init__(self, domain=None, **config):
+    def __init__(self, domain=None, version=None, **config):
         self.domain = domain
+        # if a domain is not configured this is part of the setup pipeline
+        # this is a bit complex in Sentry's SSO implementation as we don't
+        # provide a great way to get initial state for new setup pipelines
+        # vs missing state in case of migrations.
+        if domain is None:
+            version = DATA_VERSION
+        else:
+            version = None
+        self.version = version
         super(GoogleOAuth2Provider, self).__init__(**config)
 
     def get_configure_view(self):
@@ -51,7 +61,10 @@ class GoogleOAuth2Provider(OAuth2Provider):
                 client_id=self.client_id,
                 client_secret=self.client_secret,
             ),
-            FetchUser(domain=self.domain),
+            FetchUser(
+                domain=self.domain,
+                version=self.version,
+            ),
         ]
 
     def get_refresh_token_url(self):
@@ -59,18 +72,28 @@ class GoogleOAuth2Provider(OAuth2Provider):
 
     def build_config(self, state):
         return {
-            'domain': state['domain']
+            'domain': state['domain'],
+            'version': DATA_VERSION,
         }
 
     def build_identity(self, state):
+        # https://developers.google.com/identity/protocols/OpenIDConnect#server-flow
         # data.user => {
-        #   "displayName": "David Cramer",
-        #   "emails": [{"value": "david@getsentry.com", "type": "account"}],
-        #   "domain": "getsentry.com",
-        #   "verified": false
+        #      "iss":"accounts.google.com",
+        #      "at_hash":"HK6E_P6Dh8Y93mRNtsDB1Q",
+        #      "email_verified":"true",
+        #      "sub":"10769150350006150715113082367",
+        #      "azp":"1234987819200.apps.googleusercontent.com",
+        #      "email":"jsmith@example.com",
+        #      "aud":"1234987819200.apps.googleusercontent.com",
+        #      "iat":1353601026,
+        #      "exp":1353604926,
+        #      "hd":"example.com"
         # }
         data = state['data']
         user_data = state['user']
+        # TODO(dcramer): we should move towards using user_data['sub'] as the
+        # primary key per the Google docs
         return {
             'id': user_data['email'],
             'email': user_data['email'],

@@ -9,38 +9,48 @@ from urllib import urlencode
 
 from .constants import (
     DOMAIN_BLOCKLIST, ERR_INVALID_DOMAIN, ERR_INVALID_RESPONSE,
-    USER_DETAILS_ENDPOINT
 )
+from .utils import urlsafe_b64decode
 
 logger = logging.getLogger('sentry.auth.google')
 
 
 class FetchUser(AuthView):
-    def __init__(self, domain=None, *args, **kwargs):
+    def __init__(self, domain, version, *args, **kwargs):
         self.domain = domain
+        self.version = version
         super(FetchUser, self).__init__(*args, **kwargs)
 
     def dispatch(self, request, helper):
-        access_token = helper.fetch_state('data')['access_token']
+        data = helper.fetch_state('data')
 
-        req = safe_urlopen('{0}?{1}&alt=json'.format(
-            USER_DETAILS_ENDPOINT,
-            urlencode({
-                'access_token': access_token,
-            })
-        ))
-        body = safe_urlread(req)
-        data = json.loads(body)
-
-        if not data.get('data'):
-            logger.error('Invalid response: %s' % body)
+        try:
+            id_token = data['id_token']
+        except KeyError:
+            logger.error('Missing id_token in OAuth response: %s' % data)
             return helper.error(ERR_INVALID_RESPONSE)
 
-        if not data.get('data').get('email'):
-            logger.error('Invalid response: %s' % body)
+        try:
+            _, payload, _ = map(urlsafe_b64decode, id_token.split('.', 2))
+        except Exception as exc:
+            logger.error(u'Unable to decode id_token: %s' % exc, exc_info=True)
             return helper.error(ERR_INVALID_RESPONSE)
 
-        domain = extract_domain(data.get('data').get('email'))
+        try:
+            payload = json.loads(payload)
+        except Exception as exc:
+            logger.error(u'Unable to decode id_token payload: %s' % exc, exc_info=True)
+            return helper.error(ERR_INVALID_RESPONSE)
+
+        if not payload.get('email'):
+            logger.error('Missing email in id_token payload: %s' % id_token)
+            return helper.error(ERR_INVALID_RESPONSE)
+
+        # support legacy style domains with pure domain regexp
+        if self.version is None:
+            domain = extract_domain(payload['email'])
+        else:
+            domain = payload['hd']
 
         if domain in DOMAIN_BLOCKLIST:
             return helper.error(ERR_INVALID_DOMAIN % (domain,))
@@ -49,7 +59,7 @@ class FetchUser(AuthView):
             return helper.error(ERR_INVALID_DOMAIN % (domain,))
 
         helper.bind_state('domain', domain)
-        helper.bind_state('user', data.get('data'))
+        helper.bind_state('user', payload)
 
         return helper.next_step()
 

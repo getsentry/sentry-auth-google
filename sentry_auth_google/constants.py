@@ -5,7 +5,7 @@ from django.conf import settings
 
 AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/auth'
 
-ACCESS_TOKEN_URL = 'https://www.googleapis.com/oauth2/v3/token'
+ACCESS_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
 
 CLIENT_ID = getattr(settings, 'GOOGLE_CLIENT_ID', None)
 
@@ -17,6 +17,6 @@ ERR_INVALID_RESPONSE = 'Unable to fetch user information from Google.  Please ch
 
 SCOPE = 'email'
 
-USER_DETAILS_ENDPOINT = 'https://www.googleapis.com/userinfo/email'
-
 DOMAIN_BLOCKLIST = frozenset(getattr(settings, 'GOOGLE_DOMAIN_BLOCKLIST', ['gmail.com']) or [])
+
+DATA_VERSION = '1'
