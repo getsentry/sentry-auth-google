@@ -3,9 +3,7 @@ from __future__ import absolute_import, print_function
 import logging
 
 from sentry.auth.view import AuthView, ConfigureView
-from sentry.http import safe_urlopen, safe_urlread
 from sentry.utils import json
-from urllib import urlencode
 
 from .constants import (
     DOMAIN_BLOCKLIST, ERR_INVALID_DOMAIN, ERR_INVALID_RESPONSE,
