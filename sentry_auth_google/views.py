@@ -48,7 +48,10 @@ class FetchUser(AuthView):
         if self.version is None:
             domain = extract_domain(payload['email'])
         else:
-            domain = payload['hd']
+            domain = payload.get('hd')
+
+        if domain is None:
+            return helper.error(ERR_INVALID_DOMAIN % (domain,))
 
         if domain in DOMAIN_BLOCKLIST:
             return helper.error(ERR_INVALID_DOMAIN % (domain,))
