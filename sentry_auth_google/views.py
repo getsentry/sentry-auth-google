@@ -14,8 +14,8 @@ logger = logging.getLogger('sentry.auth.google')
 
 
 class FetchUser(AuthView):
-    def __init__(self, domain, version, *args, **kwargs):
-        self.domain = domain
+    def __init__(self, domains, version, *args, **kwargs):
+        self.domains = domains
         self.version = version
         super(FetchUser, self).__init__(*args, **kwargs)
 
@@ -56,7 +56,7 @@ class FetchUser(AuthView):
         if domain in DOMAIN_BLOCKLIST:
             return helper.error(ERR_INVALID_DOMAIN % (domain,))
 
-        if self.domain and self.domain != domain:
+        if self.domains and domain not in self.domains:
             return helper.error(ERR_INVALID_DOMAIN % (domain,))
 
         helper.bind_state('domain', domain)

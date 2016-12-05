@@ -16,8 +16,8 @@ class GoogleOAuth2Login(OAuth2Login):
     client_id = CLIENT_ID
     scope = SCOPE
 
-    def __init__(self, domain=None):
-        self.domain = domain
+    def __init__(self, domains=None):
+        self.domains = domains
         super(GoogleOAuth2Login, self).__init__()
 
     def get_authorize_params(self, state, redirect_uri):
@@ -37,13 +37,18 @@ class GoogleOAuth2Provider(OAuth2Provider):
     client_id = CLIENT_ID
     client_secret = CLIENT_SECRET
 
-    def __init__(self, domain=None, version=None, **config):
-        self.domain = domain
+    def __init__(self, domain=None, domains=None, version=None, **config):
+        if domain:
+            if domains:
+                domains.append(domain)
+            else:
+                domains = [domain]
+        self.domains = domains
         # if a domain is not configured this is part of the setup pipeline
         # this is a bit complex in Sentry's SSO implementation as we don't
         # provide a great way to get initial state for new setup pipelines
         # vs missing state in case of migrations.
-        if domain is None:
+        if domains is None:
             version = DATA_VERSION
         else:
             version = None
@@ -55,14 +60,14 @@ class GoogleOAuth2Provider(OAuth2Provider):
 
     def get_auth_pipeline(self):
         return [
-            GoogleOAuth2Login(domain=self.domain),
+            GoogleOAuth2Login(domains=self.domains),
             OAuth2Callback(
                 access_token_url=ACCESS_TOKEN_URL,
                 client_id=self.client_id,
                 client_secret=self.client_secret,
             ),
             FetchUser(
-                domain=self.domain,
+                domains=self.domains,
                 version=self.version,
             ),
         ]
@@ -72,7 +77,7 @@ class GoogleOAuth2Provider(OAuth2Provider):
 
     def build_config(self, state):
         return {
-            'domain': state['domain'],
+            'domains': [state['domain']],
             'version': DATA_VERSION,
         }
 
