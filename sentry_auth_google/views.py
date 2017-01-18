@@ -69,11 +69,11 @@ class GoogleConfigureView(ConfigureView):
     def dispatch(self, request, organization, auth_provider):
         config = auth_provider.config
         if config.get('domain'):
-            domains = config['domain']
+            domains = [config['domain']]
         else:
             domains = config.get('domains')
         return self.render('sentry_auth_google/configure.html', {
-            'domains': domains,
+            'domains': domains or [],
         })
 
 
