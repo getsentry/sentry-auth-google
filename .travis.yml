@@ -1,15 +1,15 @@
 sudo: false
 language: python
 services:
-  - memcached
-  - postgresql
-  - redis-server
+- memcached
+- postgresql
+- redis-server
 python:
-  - '2.7'
+- '2.7'
 cache:
   directories:
-    - node_modules
-    - "$HOME/.cache/pip"
+  - node_modules
+  - "$HOME/.cache/pip"
 deploy:
   provider: pypi
   user: getsentry
@@ -20,13 +20,15 @@ deploy:
   distributions: sdist bdist_wheel
 env:
   global:
-    - PIP_DOWNLOAD_CACHE=".pip_download_cache"
+  - PIP_DOWNLOAD_CACHE=".pip_download_cache"
+  - PIP_DISABLE_PIP_VERSION_CHECK=on
+  - SENTRY_SKIP_BACKEND_VALIDATION=1
 before_install:
-  - pip install codecov
+- pip install codecov
 install:
-  - make develop
+- make develop
 script:
-  - PYFLAKES_NODOCTEST=1 flake8
-  - coverage run --source=. -m py.test tests
+- PYFLAKES_NODOCTEST=1 flake8
+- coverage run --source=. -m py.test tests
 after_success:
-  - codecov
+- codecov
