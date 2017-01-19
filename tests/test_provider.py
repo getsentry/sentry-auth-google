@@ -7,7 +7,6 @@ from sentry.models import AuthIdentity, AuthProvider
 from sentry.testutils import TestCase
 
 from sentry_auth_google.constants import DATA_VERSION
-from sentry_auth_google.provider import GoogleOAuth2Provider
 
 
 class GoogleOAuth2ProviderTest(TestCase):
@@ -55,16 +54,16 @@ class GoogleOAuth2ProviderTest(TestCase):
         state = {
             'domain': 'example.com',
             'user': {
-                 'iss': 'accounts.google.com',
-                 'at_hash': 'HK6E_P6Dh8Y93mRNtsDB1Q',
-                 'email_verified': 'true',
-                 'sub': '10769150350006150715113082367',
-                 'azp': '1234987819200.apps.googleusercontent.com',
-                 'email': 'jsmith@example.com',
-                 'aud': '1234987819200.apps.googleusercontent.com',
-                 'iat': 1353601026,
-                 'exp': 1353604926,
-                 'hd': 'example.com'
+                'iss': 'accounts.google.com',
+                'at_hash': 'HK6E_P6Dh8Y93mRNtsDB1Q',
+                'email_verified': 'true',
+                'sub': '10769150350006150715113082367',
+                'azp': '1234987819200.apps.googleusercontent.com',
+                'email': 'jsmith@example.com',
+                'aud': '1234987819200.apps.googleusercontent.com',
+                'iat': 1353601026,
+                'exp': 1353604926,
+                'hd': 'example.com'
             },
         }
         result = provider.build_config(state)
