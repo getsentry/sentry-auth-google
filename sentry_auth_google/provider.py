@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function
 
+from sentry.auth.provider import MigratingIdentityId
 from sentry.auth.providers.oauth2 import (
     OAuth2Callback, OAuth2Provider, OAuth2Login
 )
@@ -97,10 +98,14 @@ class GoogleOAuth2Provider(OAuth2Provider):
         # }
         data = state['data']
         user_data = state['user']
-        # TODO(dcramer): we should move towards using user_data['sub'] as the
-        # primary key per the Google docs
+
+        # XXX(epurkhiser): We initially were using the email as the id key.
+        # This caused account dupes on domain changes. Migrate to the
+        # account-unique sub key.
+        user_id = MigratingIdentityId(id=user_data['sub'], legacy_id=user_data['email'])
+
         return {
-            'id': user_data['email'],
+            'id': user_id,
             'email': user_data['email'],
             'name': user_data['email'],
             'data': self.get_oauth_data(data),
