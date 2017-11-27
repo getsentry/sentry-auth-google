@@ -2,6 +2,7 @@
 
 develop:
 	pip install "pip>=7"
+	pip install -e git+https://github.com/getsentry/sentry.git#egg=sentry[dev]
 	pip install -e .
 	make install-tests
 
