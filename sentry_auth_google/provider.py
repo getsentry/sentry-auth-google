@@ -109,4 +109,5 @@ class GoogleOAuth2Provider(OAuth2Provider):
             'email': user_data['email'],
             'name': user_data['email'],
             'data': self.get_oauth_data(data),
+            'email_verified': user_data['email_verified'],
         }
