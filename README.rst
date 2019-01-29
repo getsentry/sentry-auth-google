@@ -9,7 +9,7 @@ Install
 For Sentry >= 8.23.0:
 ::
 
-    $ pip install https://github.com/getsentry/sentry-auth-google/archive/master.zip
+    $ pip install sentry-auth-google
     
 For Sentry <= 8.22.0 (`See Issue <https://github.com/getsentry/sentry-auth-google/issues/21>`_):
 ::
